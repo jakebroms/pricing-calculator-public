@@ -64,7 +64,9 @@ header.top img{height:34px;display:block}
 .freebox .badge{margin-left:auto;background:var(--cinnabar);color:#fff;font-size:10.5px;font-weight:700;padding:3px 9px;border-radius:20px;letter-spacing:.04em;text-transform:uppercase}
 .freebox .blurb{font-size:12.5px;color:var(--mute);margin-bottom:13px;line-height:1.5}
 .chips{display:flex;flex-wrap:wrap;gap:6px}
-.chip{font-size:11.5px;color:var(--ink);background:var(--soft);border:1px solid var(--line);padding:4px 9px;border-radius:7px;font-weight:500}
+.chip{font-size:11.5px;color:var(--ink);background:var(--soft);border:1px solid var(--line);padding:4px 9px;border-radius:7px;font-weight:500;cursor:pointer;transition:all .15s ease}
+.chip:hover{background:var(--white);border-color:var(--navy);color:var(--navy)}
+#groupOverlay.no-tabs .gd-tabs{display:none}
 .lite{background:var(--white);border:1px solid var(--line);border-radius:15px;padding:18px 20px;margin-bottom:16px;box-shadow:0 1px 3px rgba(11,42,74,.05)}
 .lite .lt-top{display:flex;align-items:center;gap:9px;margin-bottom:4px}
 .lite h3{font-family:var(--body);font-weight:700;font-size:14px;color:var(--navy)}
@@ -352,6 +354,18 @@ const GROUP_MEMBERS={
 
 const CROSS_NETWORK=['Technology Transformation','Future Finance Leaders','Women in NeuGroup','Crisis Community','Commodities','Payments Strategy','Working Capital Optimization','Diversity, Equity & Inclusion','Environmental, Social & Governance'];
 
+const CROSS_NETWORK_DETAIL={
+'Technology Transformation':{founded:2020,whoFor:"Finance, treasury and technology leaders driving innovation and enterprise-wide change through digital tools, platforms and strategies.",desc:"Brings together finance, treasury and technology leaders driving innovation and enterprise-wide change through digital tools, platforms and strategies. A forum to exchange insights on core treasury systems — TMS platforms, point solutions and broader finance technology stacks — while benchmarking implementation and optimization efforts and exploring the business value and practical applications of emerging technologies such as generative and agentic AI."},
+'Future Finance Leaders':{founded:2020,whoFor:"NeuGroup members identified as high-potential talent through their firms' evaluation frameworks.",desc:"Provides development and leadership-building opportunities through peer knowledge exchange for strategic finance analysts and managers — in treasury and corporate finance — identified as high-potential talent through their firms' evaluation frameworks. Builds foundational expertise while exposing members to innovative approaches across capital markets, financial risk management, cash forecasting and management, working capital, financial operations, planning and risk analysis."},
+'Women in NeuGroup':{founded:2019,whoFor:"Women members across the NeuGroup Network.",desc:"Brings together women leaders across finance and treasury for authentic dialogue, meaningful peer connection and shared advancement. A trusted forum to explore key trends — from leadership and career progression to digital transformation, sustainability and risk excellence — while supporting one another's professional and personal growth."},
+'Crisis Community':{founded:2020,whoFor:"NeuGroup members navigating acute events such as geopolitical or market shocks.",desc:"A dedicated platform for members navigating acute events such as COVID-19, the Argentina currency collapse, the Russia/Ukraine conflict and other geopolitical or market shocks. Peer Group Leaders quickly schedule virtual sessions for members to convene urgently on highly specific challenges — sanctions compliance, liquidity constraints, capital controls, counterparty risk, supply chain disruption, regulatory uncertainty and workforce impacts — offering a confidential space for real-time dialogue and practical problem-solving."},
+'Commodities':{founded:2023,whoFor:"Corporate treasury and procurement professionals responsible for managing commodity exposures.",desc:"Targets treasury and procurement professionals responsible for managing exposure to commodity price volatility. Members exchange insights on designing effective risk management programs, evaluating hedging instruments and addressing accounting considerations associated with commodity risk management activities."},
+'Payments Strategy':{founded:2023,whoFor:"Corporate finance, treasury and technology professionals responsible for digitizing and integrating payments capabilities.",desc:"Connects members seeking to expand business development and increase working capital productivity by digitizing and integrating payments capabilities into enhanced client solutions. Explores how enterprise payments strategies can expand operating models, unlock the value of payments data and improve working capital turnover."},
+'Working Capital Optimization':{founded:2024,whoFor:"Working capital management professionals.",desc:"Brings together finance leaders focused on strengthening liquidity and unlocking cash across the enterprise. Members exchange insights on working capital strategies — cash conversion, receivables and payables, and inventory optimization — while exploring digital innovations reshaping working capital performance."},
+'Diversity, Equity & Inclusion':{founded:2020,whoFor:"Corporate finance and treasury professionals responsible for diversity, equity and inclusion initiatives.",desc:"A working group dedicated to advancing meaningful opportunities for diverse finance professionals, diverse financial services providers, and underserved communities. Members share approaches to embedding DEI principles within finance organizations and broader business ecosystems."},
+'Environmental, Social & Governance':{founded:2020,whoFor:"Corporate finance and treasury professionals responsible for environmental, social and governance initiatives.",desc:"A working group for members and their colleagues to exchange insights on evolving ESG priorities and the role of finance in advancing ESG initiatives across the enterprise. Focuses on developing best practices that support long-term value creation and fiscal responsibility, including how organizations present themselves to investors, banks, regulators and other stakeholders to strengthen credibility and access to capital."}
+};
+
 const DISCOUNT=[0,0,0.0462,0.0846,0.1154,0.1415,0.1615,0.1785,0.1923,0.2046,0.2138,0.2215,0.2277,0.2323,0.2369,0.2400,0.2431,0.2462,0.2477,0.2492,0.2508];
 function discountFor(n){return n<=0?0:DISCOUNT[Math.min(n,20)];}
 
@@ -378,7 +392,7 @@ function renderFamilies(){
       ).join('')+`</div>`;
     host.appendChild(card);
   });
-  document.getElementById('cnChips').innerHTML=CROSS_NETWORK.map(c=>{const star=c==='Technology Transformation'?'<span class="chip-mark" title="Featured channel">★</span>':'';return `<span class="chip">${star}${c}</span>`;}).join('');
+  document.getElementById('cnChips').innerHTML=CROSS_NETWORK.map((c,i)=>`<span class="chip" onclick="openCnInfo(${i})">${c}</span>`).join('');
 }
 
 /* lite steppers */
@@ -473,6 +487,26 @@ function openGroupInfo(id){
     membersEl.innerHTML='<p class="gd-note">No member roster published yet for this group.</p>';
   }
   setGroupTab('about');
+  document.getElementById('groupOverlay').classList.remove('no-tabs');
+  document.getElementById('groupOverlay').classList.add('show');
+}
+function openCnInfo(idx){
+  const name=CROSS_NETWORK[idx]; const d=CROSS_NETWORK_DETAIL[name];
+  document.getElementById('gdName').textContent=name;
+  document.getElementById('gdFounded').textContent=d?'Founded '+d.founded:'Cross-Network Channel';
+  const aboutEl=document.getElementById('gdAbout'); aboutEl.innerHTML='';
+  if(d){
+    const who=document.createElement('p'); who.className='gd-who';
+    const strong=document.createElement('strong'); strong.textContent="Who it’s for: ";
+    who.appendChild(strong); who.appendChild(document.createTextNode(d.whoFor));
+    const desc=document.createElement('p'); desc.className='gd-desc'; desc.textContent=d.desc;
+    aboutEl.appendChild(who); aboutEl.appendChild(desc);
+  } else {
+    aboutEl.innerHTML='<p class="gd-note">No description available yet.</p>';
+  }
+  document.getElementById('gdAboutPane').classList.remove('hidden');
+  document.getElementById('gdMembersPane').classList.add('hidden');
+  document.getElementById('groupOverlay').classList.add('no-tabs');
   document.getElementById('groupOverlay').classList.add('show');
 }
 function closeGroupInfo(){document.getElementById('groupOverlay').classList.remove('show');}
