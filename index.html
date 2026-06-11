@@ -377,7 +377,7 @@ function selectedEntries(){return [...state.qty.entries()].filter(([,q])=>q>0).m
 function totalUnits(){let n=0;for(const v of state.qty.values())n+=v;return n;}
 
 const fmt=n=>'$'+Math.round(n).toLocaleString('en-US');
-const fmtR=n=>'$'+(Math.round(n/100)*100).toLocaleString('en-US');
+const fmtR=n=>'$'+(Math.round(n/50)*50).toLocaleString('en-US');
 
 /* peer-group grid */
 function renderFamilies(){
